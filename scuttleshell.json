@@ -1,0 +1,12 @@
+{
+  "name": "scuttleshell",
+  "description": "Native app companion to sbot webextensions",
+  "path": "C:\\Users\\soapdog\\prog\\ssbc\\scuttle-shell\\app.bat",
+  "type": "stdio",
+  "allowed_extensions": [
+    "share_on_scuttlebutt@andregarzia.com",
+    "ssb_protocol_handler@andregarzia.com",
+    "sbot_test@andregarzia.com",
+    "patchfox@andregarzia.com"
+  ]
+}
