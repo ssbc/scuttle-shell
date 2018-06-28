@@ -7,8 +7,15 @@ This is a [Secure Scuttlebutt](http://scuttlebutt.nz) system tray application. I
 ## Install globally
 
 ```
-$ npm install -g
+$ npm install -g scuttle-shell
 ```
+
+or if you cloned this repo (run from the repo folder itself):
+
+```
+$ npm install -g 
+```
+
 
 You can run the app by executing `scuttleshell` on your terminal.
 
