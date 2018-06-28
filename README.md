@@ -40,5 +40,5 @@ $ npm run check-win
 If anything went wrong during the setup or if you rename the folder this app is in, you can redo the setup with:
 
 ```
-$ npm run install
+$ npm install
 ```

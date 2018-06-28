@@ -24,9 +24,6 @@ if (keys.curve === 'k256') {
 
 const manifestFile = path.join(config.path, 'manifest.json')
 
-// special server command:
-// import sbot and start the server
-
 const createSbot = require('scuttlebot')
   // .use(require('scuttlebot/plugins/plugins'))
   .use(require('scuttlebot/plugins/master'))
@@ -36,22 +33,13 @@ const createSbot = require('scuttlebot')
   .use(require('ssb-blobs'))
   .use(require('scuttlebot/plugins/invite'))
   .use(require('scuttlebot/plugins/local'))
-  // .use(require('scuttlebot/plugins/logging'))
-  // .use(require('scuttlebot/plugins/private'))
-  // .use(require('ssb-query'))
-  // .use(require('ssb-links'))
+  .use(require('ssb-query'))
   .use(require('ssb-ooo'))
   .use(require('ssb-ebt'))
   .use(require('ssb-ws'))
   .use(require('ssb-names'))
   .use(require('ssb-backlinks'))
-
-// http.createServer(
-//   serve({ root: path.resolve('../webextension/build/') })
-// ).listen(3013)
-
-// add third-party plugins
-// require('./plugins/plugins').loadUserPlugins(createSbot, config)
+  .use(require('ssb-about'))
 
 // start server
 
@@ -65,7 +53,7 @@ const icon = fs.readFileSync(path.join(__dirname, `icon.${process.platform === '
 const tray = new SysTray({
   menu: {
     icon: icon.toString('base64'),
-    title: 'Secure Scuttlebutt',
+    title: 'Scuttle-Shell',
     tooltip: 'Secure Scuttlebutt tray app',
     items: [
 
