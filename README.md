@@ -4,6 +4,8 @@
 
 This is a [Secure Scuttlebutt](http://scuttlebutt.nz) system tray application. It provides an always-running _sbot_ for your local system.
 
+This app also setups itself as a [Native Host App](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging) that can be used by **authorized Firefox Add-ons** such as [Patchfox](https://github.com/soapdog/patchfox).
+
 ## Install globally
 
 ```
