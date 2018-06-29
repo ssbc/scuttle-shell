@@ -3,7 +3,9 @@ const nativeMessage = require('chrome-native-messaging')
 const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
-const home = require('os').homedir()
+const config = require('ssb-config/inject')(process.env.ssb_appname)
+
+const pathToSecret = path.join(config.path, 'secret')
 
 const input = new nativeMessage.Input()
 const transform = new nativeMessage.Transform((msg, push, done) => {
@@ -16,9 +18,9 @@ const output = new nativeMessage.Output()
 
 const getConfig = () => {
   try {
-    let secret = fs.readFileSync(`${home}/.ssb/secret`, "utf8")
+    let secret = fs.readFileSync(pathToSecret, "utf8")
     let keys = JSON.parse(secret.replace(/#[^\n]*/g, ''))
-    let manifest = JSON.parse(fs.readFileSync(`${home}/.ssb/manifest.json`))
+    let manifest = JSON.parse(fs.readFileSync(path.join(config.path, 'manifest.json')))
     let remote = "ws://localhost:8989~shs:" + keys.id.substring(1, keys.id.indexOf('.'))
     return { type: 'config', keys: keys, manifest: manifest, remote: remote, secret: secret }
   } catch (n) {
@@ -59,9 +61,9 @@ const getReplyFor = (msg, cb) => {
       process.exit(1)
     }
     case 'get-config': {
-      let secretRaw = fs.readFileSync(`${home}/.ssb/secret`)
+      let secretRaw = fs.readFileSync(pathToSecret)
       let keys = JSON.parse(secret.replace(/#[^\n]*/g, ''))
-      let manifest = JSON.parse(fs.readFileSync(`${home}/.ssb/manifest.json`))
+      let manifest = JSON.parse(fs.readFileSync(path.join(config.path, 'manifest.json')))
       let remote = "ws://localhost:8989~shs:" + keys.id.substring(1, keys.id.indexOf('.'))
 
       cb({ type: 'config', keys, manifest, remote })
