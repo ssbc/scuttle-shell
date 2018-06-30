@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
-const http = require('http')
-const serve = require('ecstatic')
+// const http = require('http')
+// const serve = require('ecstatic')
 const fs = require('fs')
 const path = require('path')
 const ssbKeys = require('ssb-keys')
