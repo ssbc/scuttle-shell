@@ -1,7 +1,7 @@
 {
   "name": "scuttleshell",
   "description": "Native app companion to sbot webextensions",
-  "path": "C:\\Users\\soapdog\\prog\\ssbc\\scuttle-shell\\app.bat",
+  "path": "/home/mix/projects/SSBC/scuttle-shell/host-app.js",
   "type": "stdio",
   "allowed_extensions": [
     "share_on_scuttlebutt@andregarzia.com",

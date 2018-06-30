@@ -1,18 +1,17 @@
-
-
 var homedir = require('os').homedir()
 var path = require('path')
-var macPath = homedir + "/Library/Application Support/Mozilla/NativeMessagingHosts/scuttleshell.json"
-var linuxPath = homedir + "/.mozilla/native-messaging-hosts/scuttleshell.json"
-var manifestPath = process.platform === "darwin" ? macPath : linuxPath
-var manifestFolderPath = manifestPath.replace("scuttleshell.json", "")
-var appPath = path.resolve("../host-app.js")
-var localManifestFile = path.resolve("../scuttleshell.json")
-var fs = require("fs")
-var mkdirp = require("mkdirp")
+var fs = require('fs')
+var mkdirp = require('mkdirp')
+
+var manifestFolderPath = process.platform === 'darwin'
+  ? path.join(homedir, '/Library/Application Support/Mozilla/NativeMessagingHosts')
+  : path.join(homedir, '/.mozilla/native-messaging-hosts')
+var manifestPath = path.join(manifestFolderPath, 'scuttleshell.json')
+
+var appPath = path.join(__dirname, '../host-app.js')
+var localManifestFile = path.join(__dirname, '../scuttleshell.json')
 
 function setup() {
-
   if (process.platform == "win32") {
     console.log("This script doesn't work on windows, try npm run setup-win")
     return 1
@@ -36,7 +35,7 @@ function setup() {
     console.log("[ERROR] App not found at declared location", applicationLauncherPath)
     console.log("FIXING...")
     manifest.path = appPath
-    fs.writeFileSync(localManifestFile, JSON.stringify(manifest))
+    fs.writeFileSync(localManifestFile, JSON.stringify(manifest, null, 2))
   } else {
     console.log("[OK] Application found at the correct location", applicationLauncherPath)
   }

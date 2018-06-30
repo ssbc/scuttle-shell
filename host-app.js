@@ -1,4 +1,3 @@
-
 const nativeMessage = require('chrome-native-messaging')
 const { spawn } = require('child_process')
 const path = require('path')
