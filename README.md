@@ -18,8 +18,20 @@ or if you cloned this repo (run from the repo folder itself):
 $ npm install -g 
 ```
 
-
 You can run the app by executing `scuttleshell` on your terminal.
+
+## Using it programmatically
+
+Right now, there is only one feature exported by the `scuttle-shell` module which is the ability to start a server. Example:
+
+```
+let scuttleshell = require("scuttle-shell")
+
+console.log("Starting sbot, quitting after 30 seconds")
+scuttleshell.start()
+
+setTimeout(scuttleshell.stop, 30000)
+```
 
 ## Setup
 
