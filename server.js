@@ -58,7 +58,7 @@ const tray = new SysTray({
   menu: {
     icon: icon.toString('base64'),
     title: 'Scuttle-Shell',
-    tooltip: 'Secure Scuttlebutt tray app',
+    tooltip: 'Secure Scuttlebutt',
     items: [
 
       {
