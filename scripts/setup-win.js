@@ -3,7 +3,9 @@ var path = require('path')
 var regedit = require('regedit')
 var fs = require("fs")
 var appPath = path.resolve(".\\app.bat")
+var appManifestTemplateFile = path.resolve(".\\scuttleshell.template.json")
 var appManifestFile = path.resolve(".\\scuttleshell.json")
+
 
 function setup() {
 
@@ -17,12 +19,12 @@ function setup() {
     return 1
   }
 
-  if (!fs.existsSync(appManifestFile)) {
-    console.log("[ERROR] App manifest not found at: ", appManifestFile)
+  if (!fs.existsSync(appManifestTemplateFile)) {
+    console.log("[ERROR] App manifest not found at: ", appManifestTemplateFile)
     return 1
   }
 
-  let manifest = JSON.parse(fs.readFileSync(appManifestFile))
+  let manifest = JSON.parse(fs.readFileSync(appManifestTemplateFile))
 
   let applicationLauncherPath = manifest.path
 
@@ -40,7 +42,7 @@ function setup() {
   var valuesToPut = {
     'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\scuttleshell': {
       'scuttleshell': {
-        value: appManifestFile,
+        value: appManifestTemplateFile,
         type: 'REG_DEFAULT'
       }
     }
