@@ -7,42 +7,35 @@ var appManifestTemplateFile = path.resolve(".\\scuttleshell.template.json")
 var appManifestFile = path.resolve(".\\scuttleshell.json")
 
 
-function setup() {
+function setup(cb) {
 
   if (process.platform !== "win32") {
     console.log("This script works only on windows, try npm run setup")
-    return 1
+    cb(1)
   }
 
   if (!fs.existsSync(appPath)) {
     console.log("[ERROR] Application not found at: ", appPath)
-    return 1
+    cb(1)
   }
 
   if (!fs.existsSync(appManifestTemplateFile)) {
     console.log("[ERROR] App manifest not found at: ", appManifestTemplateFile)
-    return 1
+    cb(1)
   }
 
-  let manifest = JSON.parse(fs.readFileSync(appManifestTemplateFile))
+  let manifestTemplate = JSON.parse(fs.readFileSync(appManifestTemplateFile))
 
-  let applicationLauncherPath = manifest.path
+  manifestTemplate.path = appPath
+  fs.writeFileSync(appManifestFile, JSON.stringify(manifestTemplate))
 
-  if (!fs.existsSync(applicationLauncherPath)) {
-    console.log("[ERROR] App not found at declared location", applicationLauncherPath)
-    console.log("FIXING...")
-    manifest.path = appPath
-    fs.writeFileSync(appManifestFile, JSON.stringify(manifest))
-  } else {
-    console.log("[OK] Application found at the correct location", applicationLauncherPath)
-  }
 
   // This now involves writing to the registry, I am a bit scared of that...
 
   var valuesToPut = {
     'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\scuttleshell': {
       'scuttleshell': {
-        value: appManifestTemplateFile,
+        value: appManifestFile,
         type: 'REG_DEFAULT'
       }
     }
@@ -52,20 +45,20 @@ function setup() {
     regedit.putValue(valuesToPut, function (err) {
       if (err) {
         console.log("[ERROR] Problem writing to registry.", err)
-        return 1
+        cb(1)
       } else {
         console.log("[OK] Wrote manifest path to registry.\n[INFO] Try: npm run check-win")
-        return 0
+        cb(0)
       }
     })
   })
-  return 0
 }
 
 module.exports = setup
 
 if (require.main === module) {
-  var errorLevel = setup()
-  process.exit(errorLevel)
+  setup((errorLevel) => {
+    process.exit(errorLevel)
+  })
 }
 
