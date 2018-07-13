@@ -8,8 +8,11 @@ const notifier = require('node-notifier')
 const SysTray = require('systray').default
 let tray = {}
 
-function start(appname, customPluginPaths) {
+function start(customConfig) {
 
+  customConfig = customConfig || {}
+  let appname = customConfig.appname || false
+  let customPluginPaths = customConfig.plugins || false
   let argv = process.argv.slice(2)
   let i = argv.indexOf('--')
   let conf = argv.slice(i + 1)
