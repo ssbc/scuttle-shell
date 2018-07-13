@@ -8,7 +8,7 @@ const notifier = require('node-notifier')
 const SysTray = require('systray').default
 let tray = {}
 
-function start(appname) {
+function start(appname, customPluginPaths) {
 
   let argv = process.argv.slice(2)
   let i = argv.indexOf('--')
@@ -46,6 +46,22 @@ function start(appname) {
     .use(require('ssb-search'))
     .use(require('ssb-query'))
     .use(require('ssb-ws'))
+
+
+  // Custom plugins from json
+  let appManifestFile = path.resolve('scuttleshell.json')
+  if (fs.existsSync(appManifestFile)) {
+    let manifest = JSON.parse(fs.readFileSync(manifestPath))
+    if (manifest.hasOwnProperty('plugins') && Array.isArray(manifest.plugins)) {
+      console.log("loading custom plugins: ", manifest.plugins.join(", "))
+      manifest.plugins.forEach(plugin => createSbot.use(require(plugin)))
+    }
+  }
+
+  if (Array.isArray(customPluginPaths)) {
+    console.log("loading custom plugins: ", customPluginPaths.join(", "))
+    customPluginPaths.forEach(plugin => createSbot.use(require(plugin)))
+  }
 
   // start server
 
@@ -103,7 +119,19 @@ function stop() {
   tray.kill()
 }
 
-module.exports = { start, stop }
+const getConfig = () => {
+  try {
+    let secret = fs.readFileSync(pathToSecret, "utf8")
+    let keys = JSON.parse(secret.replace(/#[^\n]*/g, ''))
+    let manifest = JSON.parse(fs.readFileSync(path.join(config.path, 'manifest.json')))
+    let remote = "ws://localhost:8989~shs:" + keys.id.substring(1, keys.id.indexOf('.'))
+    return { type: 'config', keys: keys, manifest: manifest, remote: remote, secret: secret }
+  } catch (n) {
+    return { type: 'error', msg: n.message }
+  }
+}
+
+module.exports = { start, stop, getConfig }
 
 if (require.main === module) {
   var errorLevel = start()
