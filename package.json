@@ -25,7 +25,7 @@
     "ssb-about": "^0.1.2",
     "ssb-backlinks": "^0.7.1",
     "ssb-blobs": "^1.1.4",
-    "ssb-chess-db": "^1.0.2",
+    "ssb-chess-db": "^1.0.3",
     "ssb-config": "^2.2.0",
     "ssb-ebt": "^5.2.0",
     "ssb-friends": "^2.4.0",
