@@ -9,6 +9,6 @@ addons:
     packages:
       - xvfb
 
-script: ./.travis.runtest.s
+script: ./.travis.runtest.sh
 
 # TODO: could do test/tests.bat on appvayor
