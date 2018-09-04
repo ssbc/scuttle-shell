@@ -49,7 +49,7 @@
     "setup-win": "node scripts/setup-win.js",
     "check": "node scripts/check-configuration.js",
     "setup": "node scripts/setup.js",
-    "install": "node scripts/install.js",
+    "install": "node scripts/install.js"
   },
   "optionalDependencies": {
     "mkdirp": "^0.5.1",
