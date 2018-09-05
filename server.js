@@ -54,7 +54,7 @@ function start(customConfig) {
   // Custom plugins from json
   let appManifestFile = path.resolve('scuttleshell.json')
   if (fs.existsSync(appManifestFile)) {
-    let manifest = JSON.parse(fs.readFileSync(manifestPath))
+    let manifest = JSON.parse(fs.readFileSync(appManifestFile))
     if (manifest.hasOwnProperty('plugins') && Array.isArray(manifest.plugins)) {
       console.log("loading custom plugins: ", manifest.plugins.join(", "))
       manifest.plugins.forEach(plugin => createSbot.use(require(plugin)))
