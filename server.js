@@ -6,9 +6,16 @@ const ssbKeys = require('ssb-keys')
 const minimist = require('minimist')
 const notifier = require('node-notifier')
 const SysTray = require('forked-systray').default
-let tray = {}
 
-function start(customConfig) {
+// uninitialized
+let tray = null
+let ssbConfig = null
+
+function noop () {}
+
+function start (customConfig, donecb) {
+  donecb = donecb || noop
+  // TODO: try { allthethings } catch(e) { donecb(e) }
   customConfig = customConfig || {}
   let appname = customConfig.appname || false
   let customPluginPaths = customConfig.plugins || false
@@ -22,9 +29,12 @@ function start(customConfig) {
 
   const keys = ssbKeys.loadOrCreateSync(path.join(config.path, 'secret'))
   if (keys.curve === 'k256') {
+    // i think this is _really_ old and could be removed
     throw new Error('k256 curves are no longer supported,' +
-      'please delete' + path.join(config.path, 'secret'))
+    'please delete' + path.join(config.path, 'secret'))
   }
+  config.keys = keys
+  ssbConfig = config
 
   const manifestFile = path.join(config.path, 'manifest.json')
 
@@ -71,9 +81,6 @@ function start(customConfig) {
   }
 
   // start server
-
-  config.keys = keys
-  console.log('config:', config)
   const server = createSbot(config)
 
   // write RPC manifest to ~/.ssb/manifest.json
@@ -87,6 +94,11 @@ function start(customConfig) {
       tooltip: 'Secure Scuttlebutt',
       items: [
         {
+          title: 'starting...',
+          checked: false,
+          enabled: true
+        },
+        {
           title: 'Quit',
           tooltip: 'Stop sbot and quit tray application',
           checked: false,
@@ -98,10 +110,10 @@ function start(customConfig) {
     copyDir: true
   })
 
-  tray.onClick(action => {
-    console.log('got action:', action)
-    switch (action.seq_id) {
-      case 0:
+  tray.on('click', (action) => {
+    console.log('scuttle-shell got action:', action)
+    switch (action.item.title) {
+      case 'Quit':
         console.log('### EXITING IN TWO SECONDS ###')
 
         notifier.notify({
@@ -116,24 +128,69 @@ function start(customConfig) {
     }
   })
 
-  tray.onExit((code, signal) => {
-    console.log('got exit:', code)
+  tray.on('exit', (code, signal) => {
+    console.log('scuttle-shell got exit:', code)
     setTimeout(() =>
       process.exit(0), 2000)
   })
+
+  const sbotVersion = server.version()
+  console.log(`started sbot server v${sbotVersion}`)
+
+  server.about.get((err, curr) => {
+    if (err) {
+      console.warn('got err from about idx:', err)
+      return
+    }
+    // new key maybe? might not have set a name yet
+    if (typeof curr === 'undefined') {
+      return
+    }
+    const myAbouts = curr[ssbConfig.keys.id]
+    if (typeof myAbouts === 'undefined') {
+      return
+    }
+    const myNames = myAbouts['name']
+    if (typeof myNames === 'undefined') {
+      return
+    }
+    const fromMe = myNames[ssbConfig.keys.id]
+    if (fromMe instanceof Array && fromMe.length === 2) { // format is [ 'name', ts ]
+      console.log('updating menu with', fromMe[0])
+      tray.emit('action', {
+        type: 'update-item',
+        seq_id: 0,
+        item: {
+          title: `@${myName[0]}`,
+          tooltip: ssbConfig.keys.id,
+          checked: false,
+          enabled: false
+        }
+      })
+    }
+  })
+  donecb(null)
 }
 
-function stop() {
+function stop () {
+  // todo: sbot shutdown handler?
   tray.kill()
 }
 
 const getConfig = () => {
+  if (ssbConfig === null) {
+    return { type: 'error', msg: 'uninitialized config - call start() first' }
+  }
   try {
-    let secret = fs.readFileSync(pathToSecret, 'utf8')
-    let keys = JSON.parse(secret.replace(/#[^\n]*/g, ''))
-    let manifest = JSON.parse(fs.readFileSync(path.join(config.path, 'manifest.json')))
-    let remote = 'ws://localhost:8989~shs:' + keys.id.substring(1, keys.id.indexOf('.'))
-    return { type: 'config', keys: keys, manifest: manifest, remote: remote, secret: secret }
+    const k = ssbConfig.keys
+    const manifest = JSON.parse(fs.readFileSync(path.join(ssbConfig.path, 'manifest.json')))
+    const remote = 'ws://localhost:8989~shs:' + k.id.substring(1, k.id.indexOf('.'))
+    return {
+      type: 'config',
+      keys: k,
+      manifest: manifest,
+      remote: remote
+    }
   } catch (n) {
     return { type: 'error', msg: n.message }
   }
@@ -142,6 +199,7 @@ const getConfig = () => {
 module.exports = { start, stop, getConfig }
 
 if (require.main === module) {
-  var errorLevel = start()
-  console.log('exited with:', errorLevel)
+  start({}, (err) => {
+    if (err) console.error(err)
+  })
 }

@@ -19,10 +19,10 @@
   "dependencies": {
     "chrome-native-messaging": "^0.2.0",
     "ecstatic": "^3.1.0",
-    "forked-systray": "^2.0.0",
+    "forked-systray": "^3.0.2",
     "minimist": "^1.2.0",
     "node-notifier": "^5.2.1",
-    "scuttlebot": "^11.4.2",
+    "scuttlebot": "^12.0.1",
     "ssb-about": "^0.1.2",
     "ssb-backlinks": "^0.7.1",
     "ssb-blobs": "^1.1.4",
