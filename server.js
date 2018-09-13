@@ -75,9 +75,19 @@ function start (customConfig, donecb) {
     }
   }
 
+  // from customConfig.plugins
   if (Array.isArray(customPluginPaths)) {
     console.log('loading custom plugins: ', customPluginPaths.join(', '))
     customPluginPaths.forEach(plugin => createSbot.use(require(plugin)))
+  }
+
+  // --extra-plugin
+  const args = minimist(process.argv.slice(1))
+  const extraPlugin = args['extra-plugin']
+  if (typeof extraPlugin === 'string') { // one
+    createSbot.use(require(extraPlugin))
+  } else if (extraPlugin instanceof Array) { // multiple
+    extraPlugin.forEach((plugPath) => createSbot.use(require(plugPath)))
   }
 
   // start server
