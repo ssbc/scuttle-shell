@@ -1,7 +1,7 @@
 {
   "name": "scuttle-shell",
   "description": "A system tray app for running Secure Scuttlebutt on your local system",
-  "version": "0.0.4-snapshot",
+  "version": "0.1.0",
   "author": {
     "name": "Andre Alves Garzia",
     "email": "andre@andregarzia.com",
