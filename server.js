@@ -171,7 +171,7 @@ function start (customConfig, donecb) {
         type: 'update-item',
         seq_id: 0,
         item: {
-          title: `@${myName[0]}`,
+          title: `@${fromMe[0]}`,
           tooltip: ssbConfig.keys.id,
           checked: false,
           enabled: false
