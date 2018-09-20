@@ -109,6 +109,11 @@ function start (customConfig, donecb) {
           enabled: true
         },
         {
+          title: 'version: unset',
+          checked: false,
+          enabled: false
+        },
+        {
           title: 'Quit',
           tooltip: 'Stop sbot and quit tray application',
           checked: false,
@@ -146,6 +151,15 @@ function start (customConfig, donecb) {
 
   const sbotVersion = server.version()
   console.log(`started sbot server v${sbotVersion}`)
+  tray.emit('action', {
+    type: 'update-item',
+    seq_id: 1,
+    item: {
+      title: `sbot version: ${sbotVersion}`,
+      checked: false,
+      enabled: false
+    }
+  })
 
   server.about.get((err, curr) => {
     if (err) {
@@ -166,7 +180,6 @@ function start (customConfig, donecb) {
     }
     const fromMe = myNames[ssbConfig.keys.id]
     if (fromMe instanceof Array && fromMe.length === 2) { // format is [ 'name', ts ]
-      console.log('updating menu with', fromMe[0])
       tray.emit('action', {
         type: 'update-item',
         seq_id: 0,
