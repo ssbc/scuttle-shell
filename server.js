@@ -39,6 +39,7 @@ function start (customConfig, donecb) {
   const manifestFile = path.join(config.path, 'manifest.json')
 
   const createSbot = require('scuttlebot')
+    .use(require('scuttlebot/plugins/plugins'))
     .use(require('scuttlebot/plugins/onion'))
     .use(require('scuttlebot/plugins/unix-socket'))
     .use(require('scuttlebot/plugins/no-auth'))
