@@ -58,7 +58,8 @@ function start (customConfig, donecb) {
     .use(require('ssb-private'))
     .use(require('ssb-query'))
     .use(require('ssb-search'))
-    .use(require('ssb-talequery')) // only tale:net
+    .use(require('ssb-tags'))
+    .use(require('ssb-talequery')) // only tale:net - close to obsolete %qJqQbvb8vLh5SUcSIlMeM2u0vt0M1RRaczb5NqH4tB8=.sha256
     .use(require('ssb-unread'))
     .use(require('ssb-ws'))
 

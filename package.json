@@ -38,6 +38,7 @@
     "ssb-private": "^0.2.1",
     "ssb-query": "^2.1.0",
     "ssb-search": "^1.1.1",
+    "ssb-tags": "^0.2.0",
     "ssb-talequery": "^2.0.1",
     "ssb-unread": "^1.0.1",
     "ssb-web-resolver": "^1.1.2",
