@@ -22,7 +22,7 @@
     "forked-systray": "^3.0.2",
     "minimist": "^1.2.0",
     "node-notifier": "^5.2.1",
-    "scuttlebot": "^12.1.0",
+    "scuttlebot": "^13.0.0",
     "ssb-about": "^0.1.2",
     "ssb-backlinks": "^0.7.1",
     "ssb-blobs": "^1.1.4",
