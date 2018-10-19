@@ -1,4 +1,6 @@
-#!/bin/bash
+#! /usr/bin/env bash
+
+set -e
 
 if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
   export DISPLAY=':99.0'
@@ -8,7 +10,16 @@ fi
 
 echo debug: $TRAVIS_OS_NAME $DISPLAY
 npm i
-node ./server.js
 
-# npm test
+node ./server.js &
+sbotPID=$!
+
+sleep 5
+echo checking if sbot is still up
+kill -0 $sbotPID
+./node_modules/.bin/sbot whoami
+
+kill $sbotPID
+
+
 # TODO: could do tests/test.bad on appvayor

@@ -35,5 +35,5 @@ function check () {
 module.exports = check
 
 if (require.main === module) {
-  var errorLevel = check()
+  check()
 }

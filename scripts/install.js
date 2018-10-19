@@ -1,13 +1,12 @@
-if (process.platform === "win32") {
-  // do windows setup
-  var setup = require("./setup-win")
-  var check = require("./check-configuration-win")
-} else {
-  // do linux/mac setup
-  var setup = require("./setup")
-  var check = require("./check-configuration")
+#! /usr/bin/env node
+
+// TODO: unify check scripts
+var check = require('./check-configuration' + (process.platform === 'win32' ? '-win' : ''))
+
+let steps = [require('./setup'), check]
+
+for (const s of steps) {
+  s((err) => {
+    if (err) throw err
+  })
 }
-
-setup()
-check()
-
