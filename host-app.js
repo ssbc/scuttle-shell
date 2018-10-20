@@ -33,13 +33,15 @@ const getConfig = () => { // exposes secret...
   }
 }
 
+let sbotPID = 'uninitialized'
 const startServer = (cb) => {
   output.write({ type: 'debug', msg: `starting scuttlebutt` })
 
+  // why spawn sub-process instead of import?
   let crashed = false
   var scriptPath = path.join(__dirname, 'server.js')
-  var child = spawn(process.execPath, [scriptPath])
 
+  var child = spawn(process.execPath, [scriptPath])
   child.stdout.on('data', (data) => {
     console.warn('[sbot server]', data.toString())
     output.write({ type: 'debug', msg: `stdout: ${data}` })
@@ -47,22 +49,24 @@ const startServer = (cb) => {
 
   child.stderr.on('data', (data) => {
     console.warn('[sbot server] stderr:', data.toString())
-    output.write({ type: 'error', msg: `stderr: ${data}` })
+    output.write({ type: 'debug', msg: `stderr: ${data}` })
   })
 
   child.on('close', (code) => {
     const msg = `child process exited with code ${code}`
     console.warn(msg)
-    output.write({ type: 'debug', msg: msg })
+    output.write({ type: 'error', msg: msg, ok: false })
     cb(new Error(msg))
     crashed = true
   })
 
-  output.write(getConfig())
-
   setTimeout(function () {
-    if (!crashed) cb(null, 'started') // TODO: once me
-  }, 4000)
+    if (!crashed) {
+      output.write(getConfig())
+      cb(null, { type: 'server-start', ok: true }) // TODO: once me
+      sbotPID = child.pid
+    }
+  }, 2000) // TODO: read sbot stdout
 }
 
 const getReplyFor = (msg, cb) => {
@@ -75,6 +79,7 @@ const getReplyFor = (msg, cb) => {
     case 'stop-server': {
       clearInterval(timer)
       cb(null, { type: 'shutdown', msg: 'stopping server' })
+      process.kill(sbotPID)
       process.exit(0)
     }
     case 'get-config': {
