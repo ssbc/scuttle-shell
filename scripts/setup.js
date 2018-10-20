@@ -6,6 +6,7 @@ var mkdirp = require('mkdirp')
 // TODO: hmm on windows the files are not in ../ ?
 const supportedPlatforms = {
   'win32': {
+    regKey: 'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\scuttleshell',
     loader: path.resolve('.\\app.bat'),
     manifestTemplate: path.resolve('.\\scuttleshell.template.json'),
     manifestFolder: path.join(homedir, 'AppData', 'Roaming', 'scuttle-shell')
@@ -46,31 +47,38 @@ function setup (cb) {
 
     mkdirp.sync(APPPaths.manifestFolder)
 
-    manifestLocation = path.join(APPPaths.manifestFolder, 'scuttle-shell.json')
+    manifestLocation = path.join(APPPaths.manifestFolder, 'scuttleshell.json')
     fs.writeFileSync(manifestLocation, JSON.stringify(manifest, null, 2))
   } catch (e) {
     return cb(e)
   }
 
+  console.log(`[OK] Wrote manifest path to ${manifestLocation}.`)
+
   // This now involves writing to the registry, I am a bit scared of that...
   if (process.platform !== 'win32') {
-    console.log(`[OK] Wrote manifest path to ${APPPaths.manifestFolder}.\n[INFO] Try: npm run check`)
     return cb(null)
   }
 
-  var valuesToPut = {
-    'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\scuttleshell': {
-      'scuttleshell': {
-        value: manifestLocation,
-        type: 'REG_DEFAULT'
-      }
+  let valuesToPut = {}
+  valuesToPut[APPPaths.regKey] = {
+    'scuttleshell': {
+      value: manifestLocation,
+      type: 'REG_DEFAULT'
     }
   }
 
   var RE = require('regedit')
 
-  RE.createKey('HKCU\\Software\\Mozilla\\NativeMessagingHosts\\scuttleshell', function (err) {
-    if (err) return cb(err)
+  RE.createKey(APPPaths.regKey, function (err, data) {
+    // great.. node-regit doesn't seem to adhere to cb(err, data)...?
+    // https://github.com/ironSource/node-regedit/issues/10
+    // https://github.com/ironSource/node-regedit/issues/44
+    // https://github.com/ironSource/node-regedit/issues/4
+    // ps: it also has problems when embedded in an electron asar since it generates scripts on the fly
+    console.log('[DEBUG] regedit.createKey result arguments:', arguments.length)
+    console.dir(arguments)
+    if (arguments.length === 2 && err !== null) return cb(err)
     RE.putValue(valuesToPut, function (err) {
       if (err) {
         console.error(err)

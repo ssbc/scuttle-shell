@@ -1,12 +1,20 @@
 #! /usr/bin/env node
 
+const setup = require('./setup')
 // TODO: unify check scripts
-var check = require('./check-configuration' + (process.platform === 'win32' ? '-win' : ''))
+const check = require('./check-configuration' + (process.platform === 'win32' ? '-win' : ''))
 
-let steps = [require('./setup'), check]
+setup((err) => {
+  if (err) {
+    console.log('[ERROR] scuttle-shell setup step:', err)
+    process.exitCode = 1
+    return
+  }
 
-for (const s of steps) {
-  s((err) => {
-    if (err) throw err
+  check((err) => {
+    if (err) {
+      console.log('[ERROR] scuttle-shell check step:', err)
+      process.exitCode = 1
+    }
   })
-}
+})
