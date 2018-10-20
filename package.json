@@ -21,6 +21,7 @@
     "ecstatic": "^3.1.0",
     "forked-systray": "^3.0.10",
     "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
     "node-notifier": "^5.3.0",
     "scuttlebot": "^13.0.0",
     "ssb-about": "^0.1.2",
@@ -53,7 +54,6 @@
     "install": "node scripts/install.js"
   },
   "optionalDependencies": {
-    "mkdirp": "^0.5.1",
     "regedit": "^2.2.7"
   },
   "devDependencies": {
