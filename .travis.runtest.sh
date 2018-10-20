@@ -20,4 +20,5 @@ kill -0 $sbotPID
 
 kill $sbotPID
 
-# TODO: could do tests/test.bad on appvayor
+
+node tests/start_stop.js

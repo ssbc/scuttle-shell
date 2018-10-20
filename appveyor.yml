@@ -18,7 +18,6 @@ install:
 test_script:
   - node --version
   - npm --version
-  - cd tests
-  - test.bat
+  - node tests/start_stop.js
 
 build: off
