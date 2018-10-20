@@ -9,10 +9,7 @@ addons:
 
 language: node_js
 node_js:
-  - 6
   - 8
   - 10
 
 script: ./.travis.runtest.sh
-
-# TODO: could do test/tests.bat on appvayor
