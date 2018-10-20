@@ -19,9 +19,9 @@
   "dependencies": {
     "chrome-native-messaging": "^0.2.0",
     "ecstatic": "^3.1.0",
-    "forked-systray": "^3.0.9",
+    "forked-systray": "^3.0.10",
     "minimist": "^1.2.0",
-    "node-notifier": "^5.2.1",
+    "node-notifier": "^5.3.0",
     "scuttlebot": "^13.0.0",
     "ssb-about": "^0.1.2",
     "ssb-backlinks": "^0.7.1",
