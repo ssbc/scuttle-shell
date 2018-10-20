@@ -9,7 +9,6 @@ if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
 fi
 
 echo debug: $TRAVIS_OS_NAME $DISPLAY
-npm i
 
 node ./server.js &
 sbotPID=$!
@@ -20,6 +19,5 @@ kill -0 $sbotPID
 ./node_modules/.bin/sbot whoami
 
 kill $sbotPID
-
 
 # TODO: could do tests/test.bad on appvayor

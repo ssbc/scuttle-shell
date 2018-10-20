@@ -1,0 +1,22 @@
+cache:
+  - node_modules
+
+init:
+  - git config --global core.autocrlf input
+
+# Test against the latest version of this Node.js version
+environment:
+  nodejs_version: "8"
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm install
+
+test_script:
+  - node --version
+  - npm --version
+  - cd tests
+  - test.bat
+
+# Don't actually build.
+build: off

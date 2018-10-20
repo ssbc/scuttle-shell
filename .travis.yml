@@ -1,13 +1,17 @@
-language: node_js
-node_js:
-  - 6
-  - 8
-  - 10
+os:
+  - linux
+  - osx
 
 addons:
   apt:
     packages:
       - xvfb
+
+language: node_js
+node_js:
+  - 6
+  - 8
+  - 10
 
 script: ./.travis.runtest.sh
 
