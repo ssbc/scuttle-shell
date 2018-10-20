@@ -19,7 +19,7 @@
   "dependencies": {
     "chrome-native-messaging": "^0.2.0",
     "ecstatic": "^3.1.0",
-    "forked-systray": "^3.0.8",
+    "forked-systray": "^3.0.9",
     "minimist": "^1.2.0",
     "node-notifier": "^5.2.1",
     "scuttlebot": "^13.0.0",
