@@ -35,12 +35,11 @@ const getConfig = () => { // exposes secret...
 
 let sbotPID = 'uninitialized'
 const startServer = (cb) => {
-  output.write({ type: 'debug', msg: `starting scuttlebutt` })
-
-  // why spawn sub-process instead of import?
+  // spawn sub-process instead of require()?!
+  // sadly, yes - we can't pollute stdout since it's used for chrome/extension nativeMessages
   let crashed = false
   var scriptPath = path.join(__dirname, 'server.js')
-
+  output.write({ type: 'debug', msg: `starting scuttlebutt (with ${process.env['ssb_appname']} - from ${scriptPath})` })
   var child = spawn(process.execPath, [scriptPath])
   child.stdout.on('data', (data) => {
     console.warn('[sbot server]', data.toString())

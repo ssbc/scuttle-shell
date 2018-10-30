@@ -7,6 +7,8 @@ const pull = require('pull-stream')
 const toPull = require('stream-to-pull-stream')
 const notify = require('pull-notify')
 
+const appName = 'scuttle-shell-hostapp-test'
+
 test('start and stop', function (t) {
   // t.timeoutAfter(1000 * 10)
   // helper to send cmds from time to time
@@ -14,7 +16,7 @@ test('start and stop', function (t) {
 
   // start host-app.js (with stderr copied to the test runner)
   var hostApp = spawn('node', [join(__dirname, '..', 'host-app.js')], {
-    env: Object.assign({}, process.env, { ssb_appname: 'test' }),
+    env: Object.assign({}, process.env, { ssb_appname: appName }),
     stdio: ['pipe', 'pipe', 'inherit']
   })
 
@@ -37,7 +39,7 @@ test('start and stop', function (t) {
         case 'config':
           setTimeout(() => {
             require('ssb-client')(msg.keys, {
-              path: join(homedir, '.test'),
+              path: join(homedir, '.' + appName),
               caps: { shs: require('scuttlebot/lib/ssb-cap') },
               remote: msg.remote
             }, (err, client) => {
@@ -62,8 +64,8 @@ test('start and stop', function (t) {
           break
 
         default:
-          if (typeof msg.type === 'undefined') t.comment('type undefined', JSON.stringify(msg))
-          t.comment(`[host ${msg.type}] ${msg.msg}`)
+          if (typeof msg.type === 'undefined') t.comment('warning: msg.type undefined', JSON.stringify(msg))
+          t.comment(`=> from host: [${msg.type}] ${msg.msg}`)
           break
       }
       done()
