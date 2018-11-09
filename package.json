@@ -7,10 +7,10 @@
     "email": "andre@andregarzia.com",
     "url": "http://andregarzia.com"
   },
-  "homepage": "https://github.com/soapdog/scuttle-shell",
+  "homepage": "https://github.com/ssbc/scuttle-shell",
   "repository": {
     "type": "git",
-    "url": "git://github.com/soapdog/scuttle-shell.git"
+    "url": "git://github.com/ssbc/scuttle-shell.git"
   },
   "main": "./server.js",
   "bin": {
