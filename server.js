@@ -10,6 +10,7 @@ const SysTray = require('forked-systray').default
 // uninitialized
 let tray = null
 let ssbConfig = null
+let sbotClose = noop
 
 function noop () {}
 
@@ -98,6 +99,7 @@ function start (customConfig, donecb) {
 
   // start server
   const server = createSbot(config)
+  sbotClose = server.close
 
   // write RPC manifest to ~/.ssb/manifest.json
   fs.writeFileSync(manifestFile, JSON.stringify(server.getManifest(), null, 2))
@@ -202,7 +204,7 @@ function start (customConfig, donecb) {
 }
 
 function stop () {
-  // todo: sbot shutdown handler?
+  sbotClose()
   tray.kill()
 }
 
