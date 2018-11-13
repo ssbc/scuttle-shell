@@ -78,7 +78,7 @@ These are stored under `$HOME/.ssb/node_modules`.
 
 Additonally, you can either pass the file paths to the API constructor by adding a `plugins` field to the object you pass to `.start()`. Check out `examples/launch_sbot_custom_plugin.js` to see it in action.
 
-Alternativly you can use the command-line flag of `scuttleshell`, named `--extra-plugins`. i.e. `scuttleshell --extra-plugin path/to/plugin1 --extra-plugin path/to/plugin2`. Please not that these are not installed or persisted, you need to take care of that.
+Alternativly you can use the command-line flag of `scuttleshell`, named `--extra-plugins`. i.e. `scuttleshell --extra-plugin path/to/plugin1 --extra-plugin path/to/plugin2`. Please note that these are not installed or persisted, you need to take care of that.
 
 If you don't want to store them in the `$HOME/.ssb` folder, there is also the option to create a `scuttleshell.json` file next to your custom scuttle-shell and set a `plugins` array inside it.
 
