@@ -1,39 +1,74 @@
-var fs = require('fs')
-var path = require('path')
-var homedir = require('os').homedir()
-var manifestPath = process.platform === 'darwin'
-  ? path.join(homedir, '/Library/Application Support/Mozilla/NativeMessagingHosts/scuttleshell.json')
-  : path.join(homedir, '/.mozilla/native-messaging-hosts/scuttleshell.json')
+const { join } = require('path')
+const fs = require('fs')
 
-function check () {
-  if (process.platform === 'win32') {
-    console.log('This script does not work on windows')
-    process.exit(1)
-  }
+const APPPaths = require('./platforms')
 
-  if (!fs.existsSync(manifestPath)) {
-    console.log('[ERROR] App manifest not found at declared location', manifestPath)
-    console.log('\nTry: npm run setup\n')
-    process.exit(1)
-  }
+function checkWin (cb) {
+  var regedit = require('regedit')
+  const key = APPPaths.regKey
+  regedit.list(key, (err, results) => {
+    if (err) {
+      return cb(new Error(`Registry key: ${key} doesn't exist. `))
+    }
 
-  console.log('[INFO] App manifest path location:', manifestPath)
+    if (!results[key] || !results[key].values) {
+      console.warn('registry list results:', results)
+      return cb(new Error(`Registry key does not contain expected values field`))
+    }
 
-  var manifest = require(manifestPath)
+    let manifestPath = results[key].values[''].value
 
-  if (!fs.existsSync(manifest.path)) {
-    console.log('[ERROR] Launcher not found at declared location', manifest.path)
-    console.log('\nTry: npm run setup\n')
-    process.exit(1)
-  }
+    if (!fs.existsSync(manifestPath)) {
+      return cb(new Error('App manifest not found at declared location:' + manifestPath))
+    }
 
-  console.log('[OK] Configuration appears correct\n[INFO] App located at:', manifest.path)
+    let applicationLauncherPath
+    try {
+      console.log('[INFO] App manifest path location:', manifestPath)
+      let manifest = JSON.parse(fs.readFileSync(manifestPath))
+      applicationLauncherPath = manifest.path
+    } catch (e) {
+      return cb(e)
+    }
 
-  process.exit(0)
+    if (!fs.existsSync(applicationLauncherPath)) {
+      return cb(new Error('Launcher not found at declared location:' + applicationLauncherPath))
+    }
+
+    cb(null, applicationLauncherPath)
+  })
 }
 
-module.exports = check
+function check (cb) {
+  const manifestLocation = join(APPPaths.manifestFolder, 'scuttleshell.json')
+
+  if (!fs.existsSync(manifestLocation)) {
+    return cb(new Error(`App manifest not found at declared location ${manifestLocation}`))
+  }
+
+  let manifest = null
+  try {
+    manifest = JSON.parse(fs.readFileSync(manifestLocation))
+  } catch (e) {
+    return cb(e)
+  }
+
+  if (!fs.existsSync(manifest.path)) {
+    return cb(new Error(`Launcher not found at declared location: ${manifest.path}`))
+  }
+
+  return cb(null, manifest.path)
+}
+
+module.exports = process.platform === 'win32' ? checkWin : check
 
 if (require.main === module) {
-  check()
+  check(function (err, launchPath) {
+    if (err) {
+      console.error(err)
+      console.log('\nTry: npm run setup\n')
+      return
+    }
+    console.log('[OK] Configuration appears correct\n[INFO] App located at:', launchPath)
+  })
 }

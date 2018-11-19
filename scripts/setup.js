@@ -1,32 +1,8 @@
-var homedir = require('os').homedir()
 var path = require('path')
 var fs = require('fs')
 var mkdirp = require('mkdirp')
 
-// TODO: hmm on windows the files are not in ../ ?
-const supportedPlatforms = {
-  'win32': {
-    regKey: 'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\scuttleshell',
-    loader: path.resolve('.\\app.bat'),
-    manifestTemplate: path.resolve('.\\scuttleshell.template.json'),
-    manifestFolder: path.join(homedir, 'AppData', 'Roaming', 'scuttle-shell')
-  },
-  'linux': {
-    loader: path.join(__dirname, '../host-app.js'),
-    manifestTemplate: path.join(__dirname, '../scuttleshell.template.json'),
-    manifestFolder: path.join(homedir, '.mozilla', 'native-messaging-hosts')
-  },
-  'darwin': {
-    loader: path.join(__dirname, '../host-app.js'),
-    manifestTemplate: path.join(__dirname, '../scuttleshell.template.json'),
-    manifestFolder: path.join(homedir, '/Library/Application Support/Mozilla/NativeMessagingHosts')
-  }
-}
-
-const APPPaths = supportedPlatforms[process.platform]
-if (!APPPaths) {
-  throw new Error('unsupported platform:' + process.platform)
-}
+const APPPaths = require('./platforms')
 
 function setup (cb) {
   if (!fs.existsSync(APPPaths.loader)) {
@@ -71,7 +47,7 @@ function setup (cb) {
   var RE = require('regedit')
 
   RE.createKey(APPPaths.regKey, function (err, data) {
-    // great.. node-regit doesn't seem to adhere to cb(err, data)...?
+    // great.. node-regedit doesn't seem to adhere to cb(err, data)...?
     // https://github.com/ironSource/node-regedit/issues/10
     // https://github.com/ironSource/node-regedit/issues/44
     // https://github.com/ironSource/node-regedit/issues/4

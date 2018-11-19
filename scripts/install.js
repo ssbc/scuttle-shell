@@ -1,8 +1,7 @@
 #! /usr/bin/env node
 
 const setup = require('./setup')
-// TODO: unify check scripts
-const check = require('./check-configuration' + (process.platform === 'win32' ? '-win' : ''))
+const check = require('./check-configuration')
 
 setup((err) => {
   if (err) {
