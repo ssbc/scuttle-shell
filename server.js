@@ -169,38 +169,24 @@ function start (customConfig, donecb) {
     }
   })
 
-  server.about.get((err, curr) => {
+  server.about.socialValue({ key: 'name', dest: ssbConfig.keys.id }, (err, namev) => {
     if (err) {
-      console.warn('got err from about idx:', err)
+      console.warn('got err from about plugin:', err)
+      donecb(err)
       return
     }
-    // new key maybe? might not have set a name yet
-    if (typeof curr === 'undefined') {
-      return
-    }
-    const myAbouts = curr[ssbConfig.keys.id]
-    if (typeof myAbouts === 'undefined') {
-      return
-    }
-    const myNames = myAbouts['name']
-    if (typeof myNames === 'undefined') {
-      return
-    }
-    const fromMe = myNames[ssbConfig.keys.id]
-    if (fromMe instanceof Array && fromMe.length === 2) { // format is [ 'name', ts ]
-      tray.emit('action', {
-        type: 'update-item',
-        seq_id: 0,
-        item: {
-          title: `@${fromMe[0]}`,
-          tooltip: ssbConfig.keys.id,
-          checked: false,
-          enabled: false
-        }
-      })
-    }
+    tray.emit('action', {
+      type: 'update-item',
+      seq_id: 0,
+      item: {
+        title: `@${namev}`,
+        tooltip: ssbConfig.keys.id,
+        checked: false,
+        enabled: false
+      }
+    })
+    donecb(null)
   })
-  donecb(null)
 }
 
 function stop () {

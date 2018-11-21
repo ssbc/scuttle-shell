@@ -24,7 +24,7 @@
     "mkdirp": "^0.5.1",
     "node-notifier": "^5.3.0",
     "scuttlebot": "^13.0.0",
-    "ssb-about": "^0.1.2",
+    "ssb-about": "^2.0.0",
     "ssb-backlinks": "^0.7.1",
     "ssb-blobs": "^1.1.4",
     "ssb-chess-db": "^1.0.4",
