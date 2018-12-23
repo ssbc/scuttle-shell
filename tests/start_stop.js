@@ -40,7 +40,7 @@ test('start and stop', function (t) {
           setTimeout(() => {
             require('ssb-client')(msg.keys, {
               path: join(homedir, '.' + appName),
-              caps: { shs: require('scuttlebot/lib/ssb-cap') },
+              caps: { shs: require('ssb-server/lib/ssb-cap') },
               remote: msg.remote
             }, (err, client) => {
               t.error(err, 'ssb-client error')
