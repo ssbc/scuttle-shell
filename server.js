@@ -12,9 +12,9 @@ let tray = null
 let ssbConfig = null
 let sbotClose = noop
 
-function noop () {}
+function noop() { }
 
-function start (customConfig, donecb) {
+function start(customConfig, donecb) {
   donecb = donecb || noop
   // TODO: try { allthethings } catch(e) { donecb(e) }
   customConfig = customConfig || {}
@@ -32,7 +32,7 @@ function start (customConfig, donecb) {
   if (keys.curve === 'k256') {
     // i think this is _really_ old and could be removed
     throw new Error('k256 curves are no longer supported,' +
-    'please delete' + path.join(config.path, 'secret'))
+      'please delete' + path.join(config.path, 'secret'))
   }
   config.keys = keys
   ssbConfig = config
@@ -71,16 +71,6 @@ function start (customConfig, donecb) {
 
   // load user plugins (from $HOME/.ssb/node_modules using $HOME/.ssb/config plugins {name:true})
   require('ssb-server/plugins/plugins').loadUserPlugins(createSbot, config)
-
-  // Custom plugins from json
-  let appManifestFile = path.resolve('scuttleshell.json')
-  if (fs.existsSync(appManifestFile)) {
-    let manifest = JSON.parse(fs.readFileSync(appManifestFile))
-    if (manifest.hasOwnProperty('plugins') && Array.isArray(manifest.plugins)) {
-      console.log('loading custom plugins: ', manifest.plugins.join(', '))
-      manifest.plugins.forEach(plugin => createSbot.use(require(plugin)))
-    }
-  }
 
   // from customConfig.plugins
   if (Array.isArray(customPluginPaths)) {
@@ -189,7 +179,7 @@ function start (customConfig, donecb) {
   })
 }
 
-function stop () {
+function stop() {
   sbotClose()
   tray.kill()
 }
