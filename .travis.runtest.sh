@@ -21,4 +21,3 @@ kill -0 $sbotPID
 kill $sbotPID
 
 
-node tests/start_stop.js
