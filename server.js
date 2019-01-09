@@ -39,17 +39,17 @@ function start (customConfig, donecb) {
 
   const manifestFile = path.join(config.path, 'manifest.json')
 
-  const createSbot = require('scuttlebot')
-    .use(require('scuttlebot/plugins/plugins'))
-    .use(require('scuttlebot/plugins/onion'))
-    .use(require('scuttlebot/plugins/unix-socket'))
-    .use(require('scuttlebot/plugins/no-auth'))
-    .use(require('scuttlebot/plugins/master'))
-    .use(require('scuttlebot/plugins/gossip'))
-    .use(require('scuttlebot/plugins/replicate'))
-    .use(require('scuttlebot/plugins/invite'))
-    .use(require('scuttlebot/plugins/local'))
-    .use(require('scuttlebot/plugins/logging'))
+  const createSbot = require('ssb-server')
+    .use(require('ssb-server/plugins/plugins'))
+    .use(require('ssb-server/plugins/onion'))
+    .use(require('ssb-server/plugins/unix-socket'))
+    .use(require('ssb-server/plugins/no-auth'))
+    .use(require('ssb-server/plugins/master'))
+    .use(require('ssb-server/plugins/gossip'))
+    .use(require('ssb-server/plugins/replicate'))
+    .use(require('ssb-server/plugins/invite'))
+    .use(require('ssb-server/plugins/local'))
+    .use(require('ssb-server/plugins/logging'))
     .use(require('ssb-about'))
     .use(require('ssb-backlinks'))
     .use(require('ssb-blobs'))
@@ -70,7 +70,7 @@ function start (customConfig, donecb) {
     .use(require('ssb-ws'))
 
   // load user plugins (from $HOME/.ssb/node_modules using $HOME/.ssb/config plugins {name:true})
-  require('scuttlebot/plugins/plugins').loadUserPlugins(createSbot, config)
+  require('ssb-server/plugins/plugins').loadUserPlugins(createSbot, config)
 
   // Custom plugins from json
   let appManifestFile = path.resolve('scuttleshell.json')
