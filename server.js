@@ -179,9 +179,11 @@ function start(customConfig, donecb) {
   })
 }
 
-function stop() {
+function stop(done) {
+  done = done || noop
   sbotClose()
   tray.kill()
+  done()
 }
 
 const getConfig = () => {
