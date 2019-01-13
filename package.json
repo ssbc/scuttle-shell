@@ -20,6 +20,7 @@
     "chrome-native-messaging": "^0.2.0",
     "ecstatic": "^3.1.0",
     "forked-systray": "^3.0.10",
+    "lodash.merge": "^4.6.1",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "node-notifier": "^5.3.0",

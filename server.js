@@ -2,42 +2,23 @@
 
 const fs = require('fs')
 const path = require('path')
-const ssbKeys = require('ssb-keys')
-const minimist = require('minimist')
 const notifier = require('node-notifier')
 const SysTray = require('forked-systray').default
+const minimist = require('minimist')
+const buildConfig = require('./config')
 
 // uninitialized
 let tray = null
-let ssbConfig = null
+let config = null
 let sbotClose = noop
 
 function noop () {}
 
-function start (customConfig, donecb) {
+function start (opts = {}, donecb) {
   donecb = donecb || noop
   // TODO: try { allthethings } catch(e) { donecb(e) }
-  customConfig = customConfig || {}
-  let appname = customConfig.appname || false
-  let customPluginPaths = customConfig.plugins || false
-  let argv = process.argv.slice(2)
-  let i = argv.indexOf('--')
-  let conf = argv.slice(i + 1)
-  argv = ~i ? argv.slice(0, i) : argv
-  let ssbAppName = appname || process.env.ssb_appname
 
-  const config = require('ssb-config/inject')(ssbAppName, minimist(conf))
-
-  const keys = ssbKeys.loadOrCreateSync(path.join(config.path, 'secret'))
-  if (keys.curve === 'k256') {
-    // i think this is _really_ old and could be removed
-    throw new Error('k256 curves are no longer supported,' +
-    'please delete' + path.join(config.path, 'secret'))
-  }
-  config.keys = keys
-  ssbConfig = config
-
-  const manifestFile = path.join(config.path, 'manifest.json')
+  config = buildConfig(opts)
 
   const createSbot = require('ssb-server')
     .use(require('ssb-server/plugins/plugins'))
@@ -82,10 +63,10 @@ function start (customConfig, donecb) {
     }
   }
 
-  // from customConfig.plugins
-  if (Array.isArray(customPluginPaths)) {
-    console.log('loading custom plugins: ', customPluginPaths.join(', '))
-    customPluginPaths.forEach(plugin => createSbot.use(require(plugin)))
+  // from opts.plugins
+  if (Array.isArray(opts.plugings)) {
+    console.log('loading custom plugins: ', opts.plugins.join(', '))
+    opts.plugins.forEach(plugin => createSbot.use(require(plugin)))
   }
 
   // --extra-plugin
@@ -102,6 +83,7 @@ function start (customConfig, donecb) {
   sbotClose = server.close
 
   // write RPC manifest to ~/.ssb/manifest.json
+  const manifestFile = path.join(config.path, 'manifest.json')
   fs.writeFileSync(manifestFile, JSON.stringify(server.getManifest(), null, 2))
 
   const icon = fs.readFileSync(path.join(__dirname, `icon.${process.platform === 'win32' ? 'ico' : 'png'}`))
@@ -169,7 +151,7 @@ function start (customConfig, donecb) {
     }
   })
 
-  server.about.socialValue({ key: 'name', dest: ssbConfig.keys.id }, (err, namev) => {
+  server.about.socialValue({ key: 'name', dest: config.keys.id }, (err, namev) => {
     if (err) {
       console.warn('got err from about plugin:', err)
       donecb(err)
@@ -180,7 +162,7 @@ function start (customConfig, donecb) {
       seq_id: 0,
       item: {
         title: `@${namev}`,
-        tooltip: ssbConfig.keys.id,
+        tooltip: config.keys.id,
         checked: false,
         enabled: false
       }
@@ -195,12 +177,12 @@ function stop () {
 }
 
 const getConfig = () => {
-  if (ssbConfig === null) {
+  if (config === null) {
     return { type: 'error', msg: 'uninitialized config - call start() first' }
   }
   try {
-    const k = ssbConfig.keys
-    const manifest = JSON.parse(fs.readFileSync(path.join(ssbConfig.path, 'manifest.json')))
+    const k = config.keys
+    const manifest = JSON.parse(fs.readFileSync(path.join(config.path, 'manifest.json')))
     const remote = 'ws://localhost:8989~shs:' + k.id.substring(1, k.id.indexOf('.'))
     return {
       type: 'config',
