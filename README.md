@@ -4,11 +4,20 @@
 
 This is a [Secure Scuttlebutt](http://scuttlebutt.nz) system tray application. It provides an always-running _sbot_ for your local system.
 
-## Dependencies
+## Install on macOS through [Homebrew](https://brew.sh)
+
+Did not make a pull-request to the main repo yet but you can use this:
+
+```
+homebrew install https://raw.githubusercontent.com/ssbc/scuttle-shell/homebrew/scuttleshell.rb
+```
+
+## Install from source
+
+### Dependencies
 
 You must have [Git](https://git-scm.com) and [Node](https://nodejs.org) installed.
 
-## Install globally
 
 ```
 $ npm install -g scuttle-shell
