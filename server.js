@@ -40,22 +40,31 @@ function start(customConfig, donecb) {
   const manifestFile = path.join(config.path, 'manifest.json')
 
   const createSbot = require('ssb-server')
+    // meta extensions stuff
     .use(require('ssb-server/plugins/plugins'))
+
+    // secret-stack connect-ish stuff
     .use(require('ssb-server/plugins/onion'))
     .use(require('ssb-server/plugins/unix-socket'))
     .use(require('ssb-server/plugins/no-auth'))
-    .use(require('ssb-server/plugins/master'))
-    .use(require('ssb-server/plugins/gossip'))
-    .use(require('ssb-server/plugins/replicate'))
-    .use(require('ssb-server/plugins/invite'))
     .use(require('ssb-server/plugins/local'))
+
+    // controll stuff
+    .use(require('ssb-server/plugins/master'))
     .use(require('ssb-server/plugins/logging'))
+
+    // who and how to peer
+    .use(require('ssb-invite'))
+    .use(require('ssb-gossip'))
+    .use(require('ssb-replicate'))
+    .use(require('ssb-friends'))
+
+    // view index stuff
     .use(require('ssb-about'))
     .use(require('ssb-backlinks'))
     .use(require('ssb-blobs'))
     .use(require('ssb-chess-db'))
     .use(require('ssb-ebt'))
-    .use(require('ssb-friends'))
     .use(require('ssb-links')) // needed by patchfoo
     .use(require('ssb-names'))
     .use(require('ssb-meme'))
