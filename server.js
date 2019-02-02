@@ -54,10 +54,20 @@ function start(customConfig, donecb) {
     .use(require('ssb-server/plugins/logging'))
 
     // who and how to peer
-    .use(require('ssb-invite'))
     .use(require('ssb-gossip'))
     .use(require('ssb-replicate'))
     .use(require('ssb-friends'))
+
+    // old invites
+    .use(require('ssb-invite'))
+
+    // needed by device device-addrs
+    .use(require('ssb-query'))
+ 
+    // user invites
+    .use(require('ssb-identities'))
+    .use(require('ssb-device-address'))
+    .use(require('ssb-user-invites'))
 
     // view index stuff
     .use(require('ssb-about'))
@@ -70,7 +80,6 @@ function start(customConfig, donecb) {
     .use(require('ssb-meme'))
     .use(require('ssb-ooo'))
     .use(require('ssb-private'))
-    .use(require('ssb-query'))
     .use(require('ssb-search'))
     .use(require('ssb-tags'))
     .use(require('ssb-talequery')) // only tale:net - close to obsolete %qJqQbvb8vLh5SUcSIlMeM2u0vt0M1RRaczb5NqH4tB8=.sha256
@@ -156,13 +165,14 @@ function start(customConfig, donecb) {
       process.exit(0), 2000)
   })
 
-  const sbotVersion = server.version()
-  console.log(`started sbot server v${sbotVersion}`)
+  // this is ssb-db version now?
+  const ssbVersion = server.version()
+  console.log(`started sbot server v${ssbVersion}`)
   tray.emit('action', {
     type: 'update-item',
     seq_id: 1,
     item: {
-      title: `sbot version: ${sbotVersion}`,
+      title: `ssb version: ${ssbVersion}`,
       checked: false,
       enabled: false
     }
