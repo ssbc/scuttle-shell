@@ -44,6 +44,7 @@
     "ssb-replicate": "^1.0.4",
     "ssb-search": "^1.1.1",
     "ssb-server": "^14.0.0",
+    "ssb-suggest": "^1.0.3",
     "ssb-tags": "^0.2.0",
     "ssb-talequery": "^2.0.1",
     "ssb-threads": "^3.0.1",
