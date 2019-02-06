@@ -67,7 +67,7 @@ function start(customConfig, donecb) {
     // user invites
     .use(require('ssb-identities'))
     .use(require('ssb-device-address'))
-    .use(require('ssb-user-invites'))
+    .use(require('ssb-peer-invites'))
 
     // view index stuff
     .use(require('ssb-about'))

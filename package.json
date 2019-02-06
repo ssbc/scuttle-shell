@@ -49,7 +49,7 @@
     "ssb-talequery": "^2.0.1",
     "ssb-threads": "^3.0.1",
     "ssb-unread": "^1.0.2",
-    "ssb-user-invites": "^1.1.1",
+    "ssb-peer-invites": "^1.1.1",
     "ssb-web-resolver": "^1.1.2",
     "ssb-ws": "^5.1.1"
   },
