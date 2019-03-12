@@ -35,6 +35,39 @@ scuttleshell.start()
 setTimeout(scuttleshell.stop, 30000)
 ```
 
+## API
+
+### `start(customConfig, donecb)`
+The `start()` function is used to launch scuttle-shell. You can pass a custom configuration object as the first parameter and a callback to be triggered once the shell starts.
+
+In the custom config, you can only pass _appname_ and _plugins_. Other fields are ignored.
+
+The callback receives no parameter.
+
+### `stop(done)` 
+The `stop()` function is used to stop scuttle-shell. It will close the tray application and also stop _sbot_. You can pass a callback to be triggered after it stops everything.
+
+### `getConfig()`
+The `getConfig()` function is a synchronous function that returns an object contained the current configuration. The object has the following shape:
+
+```
+{
+    type: "config",
+    keys: "<string>",
+    manifest: "<object>",
+    remote: "<string>
+}
+```
+
+If there is an error getting the config, the returned object will look like:
+
+```
+{
+    type: "error",
+    msg: "<string>
+}
+```
+
 ## Setup
 
 This application is built with [NodeJS](https://nodejs.org). To set it up run:
