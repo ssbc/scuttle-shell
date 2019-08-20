@@ -69,3 +69,8 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# executables
+scuttle-shell-linux
+scuttle-shell-macos
+scuttle-shell-win.exe

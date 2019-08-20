@@ -40,19 +40,11 @@ function start(customConfig, donecb) {
   const manifestFile = path.join(config.path, 'manifest.json')
 
   const createSbot = require('ssb-server')
-    // meta extensions stuff
-    .use(require('ssb-server/plugins/plugins'))
-
-    // secret-stack connect-ish stuff
-    .use(require('ssb-server/plugins/onion'))
-    .use(require('ssb-server/plugins/unix-socket'))
-    .use(require('ssb-server/plugins/no-auth'))
-    .use(require('ssb-server/plugins/local'))
-
-    // controll stuff
-    .use(require('ssb-server/plugins/master'))
-    .use(require('ssb-server/plugins/logging'))
-
+    .use(require('ssb-local'))
+    .use(require('ssb-logging'))
+    .use(require('ssb-master'))
+    .use(require('ssb-no-auth'))
+    .use(require('ssb-unix-socket'))
     // who and how to peer
     .use(require('ssb-gossip'))
     .use(require('ssb-replicate'))
@@ -63,7 +55,7 @@ function start(customConfig, donecb) {
 
     // needed by device device-addrs
     .use(require('ssb-query'))
- 
+
     // user invites
     .use(require('ssb-identities'))
     .use(require('ssb-device-address'))
@@ -84,12 +76,19 @@ function start(customConfig, donecb) {
     .use(require('ssb-suggest'))
     .use(require('ssb-tags'))
     .use(require('ssb-talequery')) // only tale:net - close to obsolete %qJqQbvb8vLh5SUcSIlMeM2u0vt0M1RRaczb5NqH4tB8=.sha256
-    .use(require('ssb-threads'))
+    // .use(require('ssb-threads'))
     .use(require('ssb-unread'))
+
+    // ws
     .use(require('ssb-ws'))
 
+
   // load user plugins (from $HOME/.ssb/node_modules using $HOME/.ssb/config plugins {name:true})
-  require('ssb-server/plugins/plugins').loadUserPlugins(createSbot, config)
+  try {
+    require('ssb-server/plugins/plugins').loadUserPlugins(createSbot, config)
+  } catch (n) {
+    console.log("error loading user plugins")
+  }
 
   // from customConfig.plugins
   if (Array.isArray(customPluginPaths)) {
