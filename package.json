@@ -17,11 +17,8 @@
     "scuttleshell": "./server.js"
   },
   "dependencies": {
-    "ecstatic": "^3.3.2",
-    "forked-systray": "^3.0.11",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "node-notifier": "^5.3.0",
     "sodium-native": "^2.4.2",
     "ssb-about": "^2.0.1",
     "ssb-backlinks": "^0.7.1",
@@ -54,19 +51,32 @@
     "ssb-tags": "^0.2.0",
     "ssb-talequery": "^2.0.1",
     "ssb-threads": "^3.0.1",
-    "ssb-unix-socket": "^1.0.0",
     "ssb-unread": "^1.0.8",
     "ssb-web-resolver": "^1.1.2",
-    "ssb-ws": "^5.1.1"
+    "ssb-ws": "^5.1.1",
+    "@sammacbeth/libdweb": "0.0.3",
+    "@sammacbeth/random-access-idb-mutable-file": "^0.1.1",
+    "@soapdog/webextify": "16.2.6",
+    "random-access-idb": "^1.0.4",
+    "random-access-memory": "^3.0.0",
+    "web-ext": "^2.7.0",
+    "browserify": "^16.5.0"
   },
   "scripts": {
-    "start": "node server.js",
-    "test": "node test/start_stop.js"
+    "copy:manifest": "copyfiles manifest.json dist",
+    "copy:libdweb": "copyfiles -E -u 4 \"node_modules/@sammacbeth/libdweb/src/**/*\" \"dist/libdweb",
+    "build": "npm run build:background && npm run build:server",
+    "build:background": "webextify -r fs:graceful-fs -e background.js > dist/background.js",
+    "build:server": "webextify -d  --standalone ssb -e ./server.js > dist/server.js",
+    "start": "cross-env MOZ_DISABLE_CONTENT_SANDBOX=1 web-ext run -s ./dist --firefox=firefoxnightly --no-reload",
+    "postinstall": "npm run copy:libdweb && npm run copy:manifest"
   },
+  "browserify": { "transform": [ "brfs" ] },
   "optionalDependencies": {},
   "devDependencies": {
-    "eslint-config-standard": "^11.0.0-beta.0",
-    "standard": "^12.0.1"
+    "brfs": "^2.0.2",
+    "copyfiles": "^2.1.1",
+    "cross-env": "^5.2.0"
   },
   "license": "MIT"
 }

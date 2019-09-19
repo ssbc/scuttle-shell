@@ -4,13 +4,12 @@ const fs = require('fs')
 const path = require('path')
 const ssbKeys = require('ssb-keys')
 const minimist = require('minimist')
-const notifier = require('node-notifier')
-const SysTray = require('forked-systray').default
+const manifest = require('./ssb-manifest.json')
+
+console.log("readfilesync", fs.readFileSync)
 
 // uninitialized
-let tray = null
 let ssbConfig = null
-let sbotClose = noop
 
 function noop() { }
 
@@ -44,7 +43,6 @@ function start(customConfig, donecb) {
     .use(require('ssb-logging'))
     .use(require('ssb-master'))
     .use(require('ssb-no-auth'))
-    .use(require('ssb-unix-socket'))
     // who and how to peer
     .use(require('ssb-gossip'))
     .use(require('ssb-replicate'))
@@ -82,29 +80,6 @@ function start(customConfig, donecb) {
     // ws
     .use(require('ssb-ws'))
 
-
-  // load user plugins (from $HOME/.ssb/node_modules using $HOME/.ssb/config plugins {name:true})
-  try {
-    require('ssb-server/plugins/plugins').loadUserPlugins(createSbot, config)
-  } catch (n) {
-    console.log("error loading user plugins")
-  }
-
-  // from customConfig.plugins
-  if (Array.isArray(customPluginPaths)) {
-    console.log('loading custom plugins: ', customPluginPaths.join(', '))
-    customPluginPaths.forEach(plugin => createSbot.use(require(plugin)))
-  }
-
-  // --extra-plugin
-  const args = minimist(process.argv.slice(1))
-  const extraPlugin = args['extra-plugin']
-  if (typeof extraPlugin === 'string') { // one
-    createSbot.use(require(extraPlugin))
-  } else if (extraPlugin instanceof Array) { // multiple
-    extraPlugin.forEach((plugPath) => createSbot.use(require(plugPath)))
-  }
-
   // start server
   const server = createSbot(config)
   sbotClose = server.close
@@ -112,106 +87,28 @@ function start(customConfig, donecb) {
   // write RPC manifest to ~/.ssb/manifest.json
   fs.writeFileSync(manifestFile, JSON.stringify(server.getManifest(), null, 2))
 
-  const icon = fs.readFileSync(path.join(__dirname, `icon.${process.platform === 'win32' ? 'ico' : 'png'}`))
-  tray = new SysTray({
-    menu: {
-      icon: icon.toString('base64'),
-      title: 'Scuttle-Shell',
-      tooltip: 'Secure Scuttlebutt',
-      items: [
-        {
-          title: 'starting...',
-          checked: false,
-          enabled: true
-        },
-        {
-          title: 'version: unset',
-          checked: false,
-          enabled: false
-        },
-        {
-          title: 'Quit',
-          tooltip: 'Stop sbot and quit tray application',
-          checked: false,
-          enabled: true
-        }
-      ]
-    },
-    debug: false,
-    copyDir: true
-  })
 
-  tray.on('click', (action) => {
-    console.log('scuttle-shell got action:', action)
-    switch (action.item.title) {
-      case 'Quit':
-        console.log('### EXITING IN TWO SECONDS ###')
-
-        notifier.notify({
-          title: 'Secure Scuttlebutt',
-          message: `Secure Scuttlebutt will exit in two seconds...`,
-          icon: path.join(__dirname, 'icon.png'),
-          wait: true,
-          id: 0
-        })
-
-        tray.kill()
-    }
-  })
-
-  tray.on('exit', (code, signal) => {
-    console.log('scuttle-shell got exit:', code)
-    setTimeout(() =>
-      process.exit(0), 2000)
-  })
-
-  // this is ssb-db version now?
   const ssbVersion = server.version()
   console.log(`started sbot server v${ssbVersion}`)
-  tray.emit('action', {
-    type: 'update-item',
-    seq_id: 1,
-    item: {
-      title: `ssb version: ${ssbVersion}`,
-      checked: false,
-      enabled: false
-    }
-  })
 
   server.about.socialValue({ key: 'name', dest: ssbConfig.keys.id }, (err, namev) => {
     if (err) {
       console.warn('got err from about plugin:', err)
-      donecb(err)
-      return
+    } else {
+      console.log(`you are @${namev}`)
     }
-    tray.emit('action', {
-      type: 'update-item',
-      seq_id: 0,
-      item: {
-        title: `@${namev}`,
-        tooltip: ssbConfig.keys.id,
-        checked: false,
-        enabled: false
-      }
-    })
-    donecb(null)
   })
 }
 
-function stop(done) {
-  done = done || noop
-  sbotClose()
-  tray.kill()
-  done()
-}
 
 const getConfig = () => {
+  console.log("manifest", manifest)
   if (ssbConfig === null) {
     return { type: 'error', msg: 'uninitialized config - call start() first' }
   }
   try {
     const k = ssbConfig.keys
-    const manifest = JSON.parse(fs.readFileSync(path.join(ssbConfig.path, 'manifest.json')))
+    // const manifest = JSON.parse(fs.readFileSync(path.join(ssbConfig.path, 'manifest.json')))
     const remote = 'ws://localhost:8989~shs:' + k.id.substring(1, k.id.indexOf('.'))
     return {
       type: 'config',
@@ -224,7 +121,8 @@ const getConfig = () => {
   }
 }
 
-module.exports = { start, stop, getConfig }
+
+module.exports = { start, fs, getConfig }
 
 if (require.main === module) {
   start({}, (err) => {
