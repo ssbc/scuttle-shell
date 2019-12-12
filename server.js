@@ -85,7 +85,7 @@ function start(customConfig, donecb) {
 
   // load user plugins (from $HOME/.ssb/node_modules using $HOME/.ssb/config plugins {name:true})
   try {
-    require('ssb-server/plugins/plugins').loadUserPlugins(createSbot, config)
+    require('ssb-plugins').loadUserPlugins(createSbot, config)
   } catch (n) {
     console.log("error loading user plugins")
   }
@@ -168,34 +168,38 @@ function start(customConfig, donecb) {
   // this is ssb-db version now?
   const ssbVersion = server.version()
   console.log(`started sbot server v${ssbVersion}`)
-  tray.emit('action', {
-    type: 'update-item',
-    seq_id: 1,
-    item: {
-      title: `ssb version: ${ssbVersion}`,
-      checked: false,
-      enabled: false
-    }
-  })
 
-  server.about.socialValue({ key: 'name', dest: ssbConfig.keys.id }, (err, namev) => {
-    if (err) {
-      console.warn('got err from about plugin:', err)
-      donecb(err)
-      return
-    }
+  // let the trail start because it wasn't updating infos
+  setTimeout(() => {
     tray.emit('action', {
       type: 'update-item',
-      seq_id: 0,
+      seq_id: 1,
       item: {
-        title: `@${namev}`,
-        tooltip: ssbConfig.keys.id,
+        title: `ssb version: ${ssbVersion}`,
         checked: false,
         enabled: false
       }
     })
-    donecb(null)
-  })
+
+    server.about.socialValue({ key: 'name', dest: ssbConfig.keys.id }, (err, namev) => {
+      if (err) {
+        console.warn('got err from about plugin:', err)
+        donecb(err)
+        return
+      }
+      tray.emit('action', {
+        type: 'update-item',
+        seq_id: 0,
+        item: {
+          title: `@${namev}`,
+          tooltip: ssbConfig.keys.id,
+          checked: false,
+          enabled: false
+        }
+      })
+      donecb(null)
+    })
+  }, 500)
 }
 
 function stop(done) {
