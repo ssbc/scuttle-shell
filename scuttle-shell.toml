@@ -1,0 +1,6 @@
+[server.go-sbot]
+label = "go-sbot (bundled)"
+working_folder = "."
+check_command = "go-sbot -version"
+start_command = "go-sbot"
+auto_start = false
