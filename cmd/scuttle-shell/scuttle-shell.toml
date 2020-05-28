@@ -1,0 +1,22 @@
+[servers]
+
+[servers.go-sbot]
+label = "go-sbot"
+command = "go-sbot"
+start = "-fatbot -localdiscov -localadv"
+check = "-version"
+auto_start = false
+
+[servers.racket-server]
+label = "Racket SSB Server"
+command = "racket-server"
+start = ""
+check = "version"
+auto_start = false
+
+[servers.patchwork]
+label = "Patchwork"
+command = "C:\\Users\\andre\\AppData\\Local\\Programs\\ssb-patchwork\\Patchwork.exe"
+start = ""
+check = ""
+auto_start = false

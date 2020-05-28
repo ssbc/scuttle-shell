@@ -2,7 +2,8 @@
 **/node_modules/
 
 # ignore built binaries
-cmd/scuttle-shell/scuttle-shell*
+cmd/scuttle-shell/scuttle-shell
+cmd/scuttle-shell/scuttle-shell.exe
 
 # ignore crash/test data
 **/testrun/
@@ -18,3 +19,4 @@ plugins/gossip/testdata
 *.log
 
 *.exe
+_FOSSIL_
