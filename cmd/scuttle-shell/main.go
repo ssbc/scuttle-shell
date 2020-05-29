@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,15 +12,14 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/getlantern/systray"
 	"github.com/skratchdot/open-golang/open"
-	// "github.com/ssbc/scuttle-shell/icon"
 )
 
 type Server struct {
-	Label     string `toml:"label"`
-	Command   string `toml:"command"`
-	Start     string `toml:"start"`
-	Check     string `toml:"check"`
-	AutoStart bool   `toml:"auto_start" default:"false"`
+	Label     string   `toml:"label"`
+	Command   string   `toml:"command"`
+	Start     []string `toml:"start"`
+	Check     string   `toml:"check"`
+	AutoStart bool     `toml:"auto_start" default:"false"`
 }
 
 type Config struct {
@@ -29,6 +29,47 @@ type Config struct {
 type ServerMenuItem struct {
 	server Server
 	menu   *systray.MenuItem
+
+	path string
+	cmd  *exec.Cmd
+
+	shutdown context.CancelFunc
+}
+
+func (sm *ServerMenuItem) waitForClick() {
+	for range sm.menu.ClickedCh {
+		sm.runServerMaybe()
+	}
+}
+
+func (sm *ServerMenuItem) runServerMaybe() {
+	item := sm.menu
+	server := sm.server
+	if item.Checked() {
+		// need to quit.
+		if sm.cmd == nil {
+			fmt.Println("no server started?!")
+			return
+		}
+		sm.shutdown()
+		fmt.Println("stopping", sm.server.Label)
+		sm.cmd.Wait()
+		sm.cmd = nil
+		item.Uncheck()
+	} else {
+		ctx, cancel := context.WithCancel(context.TODO()) // should be hooked into the process signal handler
+		cmd := exec.CommandContext(ctx, sm.path, server.Start...)
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stderr
+		if err := cmd.Start(); err != nil {
+			log.Fatalf("Can't start %s: %s", server.Label, err)
+			return
+		}
+
+		sm.cmd = cmd
+		sm.shutdown = cancel
+		item.Check()
+	}
 }
 
 func main() {
@@ -70,25 +111,24 @@ func onReady() {
 		log.Fatalf("Can't find scuttle-shell.toml in %s", configPath)
 	}
 
-	mServers := []*systray.MenuItem{}
-	agg := make(chan ServerMenuItem)
+	mServers := []ServerMenuItem{}
 	for _, server := range config.Servers {
 		item := systray.AddMenuItem(server.Label, server.Label)
 		path, err := exec.LookPath(server.Command)
 		if err != nil {
 			fmt.Printf("Can't find %s, disabling it's menu\n", server.Command)
 			item.Disable()
+			continue
 		} else {
 			fmt.Printf("%s is available at %s\n", server.Label, path)
 		}
-
-		go func(s Server, i *systray.MenuItem) {
-			<-item.ClickedCh
-			sm := ServerMenuItem{s, i}
-			agg <- sm
-		}(server, item)
-
-		mServers = append(mServers, item)
+		srvItem := ServerMenuItem{
+			server: server,
+			menu:   item,
+			path:   path,
+		}
+		go srvItem.waitForClick()
+		mServers = append(mServers, srvItem)
 	}
 
 	// Add quit app ...
@@ -96,6 +136,7 @@ func onReady() {
 	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
 
 	go func() {
+		// var spawnedServer *exec.Cmd
 		for {
 			select {
 			case <-mSite.ClickedCh:
@@ -103,31 +144,15 @@ func onReady() {
 			case <-mIssues.ClickedCh:
 				open.Run("https://github.com/ssbc/scuttle-shell/issues")
 			case <-mQuit.ClickedCh:
+
+				// spawnedServer.Process.Kill()
+				// if err := spawnedServer.Wait(); err != nil {
+				// fmt.Println("server failed to shutdown cleanly", err)
+				// }
+
 				systray.Quit()
 				return
-			case sm := <-agg:
-				item := sm.menu
-				server := sm.server
-				if item.Checked() {
-					// need to quit.
-					item.Uncheck()
-				} else {
-					/// need to launch, we know we'll find the path, we checked it before.
-					path, err := exec.LookPath(server.Command)
-					if err != nil {
-						fmt.Printf("Error launching %s: %s", server.Label, server.Command)
-						return
-					}
-					cmd := exec.Command(path, server.Start)
-					cmd.Stderr = os.Stderr
-					cmd.Stdout = os.Stderr
-					errCmd := cmd.Start()
-					if errCmd != nil {
-						log.Fatalf("Can't start %s: %s", server.Label, err)
-					}
 
-					item.Check()
-				}
 			}
 		}
 	}()
