@@ -119,6 +119,8 @@ func onReady() {
 						return
 					}
 					cmd := exec.Command(path, server.Start)
+					cmd.Stderr = os.Stderr
+					cmd.Stdout = os.Stderr
 					errCmd := cmd.Start()
 					if errCmd != nil {
 						log.Fatalf("Can't start %s: %s", server.Label, err)
