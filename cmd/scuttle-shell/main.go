@@ -7,7 +7,9 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
+	"sync"
 
 	"github.com/BurntSushi/toml"
 	"github.com/getlantern/systray"
@@ -31,9 +33,22 @@ type ServerMenuItem struct {
 	menu   *systray.MenuItem
 
 	path string
-	cmd  *exec.Cmd
 
+	running  sync.Mutex
+	cmd      *exec.Cmd
 	shutdown context.CancelFunc
+}
+
+func (sm *ServerMenuItem) waitForExit() {
+	sm.running.Lock()
+	defer sm.running.Unlock()
+	if sm.cmd == nil {
+		return
+	}
+	err := sm.cmd.Wait()
+	fmt.Println(sm.server.Label, "exited with", err)
+	sm.cmd = nil
+	sm.menu.Uncheck()
 }
 
 func (sm *ServerMenuItem) waitForClick() {
@@ -43,36 +58,71 @@ func (sm *ServerMenuItem) waitForClick() {
 }
 
 func (sm *ServerMenuItem) runServerMaybe() {
+	sm.running.Lock()
+	defer sm.running.Unlock()
+
 	item := sm.menu
 	server := sm.server
+
 	if item.Checked() {
 		// need to quit.
 		if sm.cmd == nil {
 			fmt.Println("no server started?!")
 			return
 		}
-		sm.shutdown()
 		fmt.Println("stopping", sm.server.Label)
-		sm.cmd.Wait()
-		sm.cmd = nil
-		item.Uncheck()
-	} else {
-		ctx, cancel := context.WithCancel(context.TODO()) // should be hooked into the process signal handler
-		cmd := exec.CommandContext(ctx, sm.path, server.Start...)
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stderr
-		if err := cmd.Start(); err != nil {
-			log.Fatalf("Can't start %s: %s", server.Label, err)
-			return
-		}
-
-		sm.cmd = cmd
-		sm.shutdown = cancel
-		item.Check()
+		sm.shutdown()
+		return
 	}
+
+	ctx, cancel := context.WithCancel(longCtx)
+	cmd := exec.CommandContext(ctx, sm.path, server.Start...)
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stderr
+	if err := cmd.Start(); err != nil {
+		log.Fatalf("Can't start %s: %s", server.Label, err)
+		return
+	}
+
+	sm.cmd = cmd
+	sm.shutdown = cancel
+	item.Check()
+
+	go sm.waitForExit()
+}
+
+var (
+	longCtx, cancelAll = context.WithCancel(context.Background())
+
+	mServers = []*ServerMenuItem{}
+)
+
+func quit() {
+	cancelAll()
+
+	// wait for server(s?) to shutdown
+	for _, srv := range mServers {
+		srv.waitForExit()
+	}
+
+	systray.Quit()
 }
 
 func main() {
+
+	c := make(chan os.Signal, 1)
+
+	// Passing no signals to Notify means that
+	// all signals will be sent to the channel.
+	signal.Notify(c, os.Interrupt)
+
+	go func() { // wait until a signal is sent to the process (like ctrl+c)
+		for s := range c {
+			fmt.Println("Got signal:", s)
+			quit()
+		}
+	}()
+
 	onExit := func() {
 		fmt.Println("Quitting")
 	}
@@ -90,7 +140,7 @@ func onReady() {
 	systray.AddSeparator()
 
 	// Load configuration and add menu items ...
-	var config Config
+	var cfg Config
 
 	// First look for "scuttle-shell.toml" next to binary
 	configPath := "scuttle-shell.toml"
@@ -107,22 +157,21 @@ func onReady() {
 		}
 	}
 
-	if _, err := toml.DecodeFile(configPath, &config); err != nil {
-		log.Fatalf("Can't find scuttle-shell.toml in %s", configPath)
+	if _, err := toml.DecodeFile(configPath, &cfg); err != nil {
+		log.Fatalf("Can't find scuttle-shell.toml in %s (%s)", configPath, err)
 	}
 
-	mServers := []ServerMenuItem{}
-	for _, server := range config.Servers {
+	for _, server := range cfg.Servers {
 		item := systray.AddMenuItem(server.Label, server.Label)
 		path, err := exec.LookPath(server.Command)
 		if err != nil {
-			fmt.Printf("Can't find %s, disabling it's menu\n", server.Command)
+			fmt.Printf("Can't find %s, disabling it's menu\n%s\n", server.Label, err)
 			item.Disable()
 			continue
 		} else {
 			fmt.Printf("%s is available at %s\n", server.Label, path)
 		}
-		srvItem := ServerMenuItem{
+		srvItem := &ServerMenuItem{
 			server: server,
 			menu:   item,
 			path:   path,
@@ -136,7 +185,6 @@ func onReady() {
 	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
 
 	go func() {
-		// var spawnedServer *exec.Cmd
 		for {
 			select {
 			case <-mSite.ClickedCh:
@@ -145,12 +193,7 @@ func onReady() {
 				open.Run("https://github.com/ssbc/scuttle-shell/issues")
 			case <-mQuit.ClickedCh:
 
-				// spawnedServer.Process.Kill()
-				// if err := spawnedServer.Wait(); err != nil {
-				// fmt.Println("server failed to shutdown cleanly", err)
-				// }
-
-				systray.Quit()
+				quit()
 				return
 
 			}
