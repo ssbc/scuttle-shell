@@ -17,7 +17,7 @@
     "scuttleshell": "./server.js"
   },
   "dependencies": {
-    "ecstatic": "^3.3.2",
+    "ecstatic": "^4.1.4",
     "forked-systray": "^3.0.11",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
