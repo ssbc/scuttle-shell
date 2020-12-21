@@ -21,7 +21,7 @@
     "forked-systray": "^3.0.11",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "node-notifier": "^5.3.0",
+    "node-notifier": "^8.0.1",
     "sodium-native": "^2.4.2",
     "ssb-about": "^2.0.1",
     "ssb-backlinks": "^0.7.1",
