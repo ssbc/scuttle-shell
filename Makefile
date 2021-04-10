@@ -3,7 +3,7 @@
 BIN_FILE=scuttle-shell
 BUILD_FOLDER=builds
 
-PLATFORMS := darwin/amd64 windows/386
+PLATFORMS := darwin/amd64 windows/386 windows/amd64
 
 temp = $(subst /, ,$@)
 OS = $(word 1, $(temp))

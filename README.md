@@ -27,3 +27,5 @@ PS> go build
 ## Makefile
 
 There is a Makefile in this project, running `make` will build _scuttle shell_ for the listed platforms, and place the resulting binaries in `./builds/`
+
+Be aware that Linux is not listed in the platforms because Linux systray cross-compilation is failing on darwin so I can't test it.
