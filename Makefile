@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := release
+.DEFAULT_GOAL := compile
 
 BIN_FILE=scuttle-shell
 BUILD_FOLDER=builds
@@ -12,7 +12,7 @@ ARCH = $(word 2, $(temp))
 WIN_FLAGS = -v -ldflags "-H=windowsgui"
 FLAGS = -v
 
-release: $(PLATFORMS)
+compile: $(PLATFORMS)
 
 $(PLATFORMS):
 ifeq ($(OS),windows)

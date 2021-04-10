@@ -23,3 +23,7 @@ From inside `cmd/scuttle-shell`
 ```
 PS> go build
 ```
+
+## Makefile
+
+There is a Makefile in this project, running `make` will build _scuttle shell_ for the listed platforms, and place the resulting binaries in `./builds/`
