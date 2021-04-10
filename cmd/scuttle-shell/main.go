@@ -133,7 +133,6 @@ func main() {
 //go:generate go run github.com/flazz/togo -pkg main -name trayIcon -input ./icon.ico
 func onReady() {
 	systray.SetIcon(trayIcon)
-	systray.SetTitle("Scuttle Shell")
 	systray.SetTooltip("Scuttle Shell running Go")
 	mMain := systray.AddMenuItem("Scuttle Shell", "Scuttle Shell in Go")
 	mSite := mMain.AddSubMenuItem("http://ssb.nz", "SSB main website")
