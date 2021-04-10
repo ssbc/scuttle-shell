@@ -109,7 +109,6 @@ func quit() {
 }
 
 func main() {
-
 	c := make(chan os.Signal, 1)
 
 	// Passing no signals to Notify means that
@@ -128,10 +127,10 @@ func main() {
 	}
 
 	systray.Run(onReady, onExit)
+
 }
 
 //go:generate go run github.com/flazz/togo -pkg main -name trayIcon -input ./icon.ico
-
 func onReady() {
 	systray.SetIcon(trayIcon)
 	systray.SetTitle("Scuttle Shell")
@@ -139,6 +138,7 @@ func onReady() {
 	mMain := systray.AddMenuItem("Scuttle Shell", "Scuttle Shell in Go")
 	mSite := mMain.AddSubMenuItem("http://ssb.nz", "SSB main website")
 	mIssues := mMain.AddSubMenuItem("Issues", "Open issue tracker")
+	mHelp := mMain.AddSubMenuItem("Help", "Need some help?")
 	systray.AddSeparator()
 
 	// Load configuration and add menu items ...
@@ -193,8 +193,10 @@ func onReady() {
 				open.Run("http://ssb.nz")
 			case <-mIssues.ClickedCh:
 				open.Run("https://github.com/ssbc/scuttle-shell/issues")
+			case <-mHelp.ClickedCh:
+				
+				return	
 			case <-mQuit.ClickedCh:
-
 				quit()
 				return
 

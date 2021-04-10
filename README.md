@@ -2,9 +2,9 @@
 
 ## Build
 
-Remember to customize your `scuttle-shell.toml` inside `cmd/scuttle-shell`.
+Remember to customise your `scuttle-shell.toml` inside `cmd/scuttle-shell`.
 
-*MacOS tip: Apps like Patchwork that is an executable, the path on `scuttle-shell.toml` may be:*
+_MacOS tip: Apps like Patchwork that is an executable, the path on `scuttle-shell.toml` may be:_
 
 `/Applications/Patchwork.app/Contents/MacOS/Patchwork`
 

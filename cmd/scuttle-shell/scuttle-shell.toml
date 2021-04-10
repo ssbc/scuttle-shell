@@ -2,21 +2,15 @@
 
 [servers.go-sbot]
 label = "go-sbot"
-command = "go-sbot"
-start = ["-fatbot", "-localdiscov", "-localadv"]
+command = "/Users/agarzia/ssbc/go-ssb/go-sbot"
+start = ["-localdiscov", "-localadv", "-wslis \":8990\"", "-l \":8009\""]
 check = "-version"
 auto_start = false
 
-[servers.racket-server]
-label = "Racket SSB Server"
-command = "racket-server"
-start = []
-check = "version"
-auto_start = false
 
 [servers.patchwork]
 label = "Patchwork"
-command = "C:\\Users\\andre\\AppData\\Local\\Programs\\ssb-patchwork\\Patchwork.exe"
+command = "/Applications/Patchwork.app/Contents/MacOS/Patchwork"
 start = []
 check = ""
 auto_start = false

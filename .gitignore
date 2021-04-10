@@ -20,3 +20,5 @@ plugins/gossip/testdata
 
 *.exe
 _FOSSIL_
+
+builds/**
