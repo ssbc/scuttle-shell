@@ -14,3 +14,10 @@ command = "/Applications/Patchwork.app/Contents/MacOS/Patchwork"
 start = []
 check = ""
 auto_start = false
+
+[servers.patchfoo]
+label = "Patchfoo"
+command = "/Users/agarzia/.local/bin/patchfoo"
+start = []
+check = ""
+auto_start = false
