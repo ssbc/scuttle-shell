@@ -1,0 +1,2 @@
+- [ ] Create a search path for the configuration file.
+- [ ] Remove title from mac menubar item.
